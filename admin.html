@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h2>Admin</h2>
+<input id="title" placeholder="Judul"><br>
+<input id="bio" placeholder="Bio"><br>
+<div id="links"></div>
+<button onclick="add()">Tambah</button>
+<button onclick="save()">Simpan</button>
+
+<script type="module">
+import { db } from "./firebase.js";
+import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const ref = doc(db,"links","main");
+let data = (await getDoc(ref)).data() || {title:"",bio:"",links:[]};
+
+document.getElementById("title").value=data.title;
+document.getElementById("bio").value=data.bio;
+
+function render(){
+let div=document.getElementById("links");
+div.innerHTML="";
+data.links.forEach((l,i)=>{
+div.innerHTML+=`
+<input value="${l.name}" onchange="data.links[${i}].name=this.value">
+<input value="${l.url}" onchange="data.links[${i}].url=this.value"><hr>`;
+});
+}
+
+window.add=()=>{data.links.push({name:"",url:""});render();}
+
+window.save=async ()=>{
+data.title=document.getElementById("title").value;
+data.bio=document.getElementById("bio").value;
+await setDoc(ref,data);
+alert("Tersimpan!");
+}
+
+render();
+</script>
+</body>
+</html>
